@@ -1,21 +1,18 @@
 package ru.prakticum.tests;
 
-import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
+import io.qameta.allure.Description;
 import io.restassured.response.Response;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import ru.prakticum.steps.OrderSteps;
 
+import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.hamcrest.Matchers.notNullValue;
 
 @RunWith(Parameterized.class)
-public class CreateOrderParameterizedTests {
+public class CreateOrderParameterizedTests extends BaseTests {
     OrderSteps orderSteps=new OrderSteps();
 
     private String firstName;
@@ -55,17 +52,11 @@ public class CreateOrderParameterizedTests {
         };
     }
 
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
-        RestAssured.filters(new RequestLoggingFilter(),new ResponseLoggingFilter());
-    }
-
     @Test
-    @DisplayName("Проверка создания заказа с разными вариантами выбора цвета самоката")
+    @Description("Проверка создания заказа с разными вариантами выбора цвета самоката")
     public void checkOrderCreationWithDiffColors() {
         Response response = orderSteps.createOrder(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color);
-        response.then().statusCode(201)
+        response.then().statusCode(SC_CREATED)
                 .and()
                 .body("track",notNullValue());
         }

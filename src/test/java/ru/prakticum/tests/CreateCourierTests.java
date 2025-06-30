@@ -1,65 +1,74 @@
 package ru.prakticum.tests;
 
-import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
+import io.qameta.allure.Description;
 import io.restassured.response.Response;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import ru.prakticum.steps.CourierSteps;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.*;
 
-public class CreateCourierTests {
+public class CreateCourierTests extends BaseTests {
     CourierSteps courierSteps=new CourierSteps();
 
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
-        RestAssured.filters(new RequestLoggingFilter(),new ResponseLoggingFilter());
-    }
-
     @Test
-    @DisplayName("При успешном создании курьера возвращается код 201 и сообщение ok: true")
+    @Description("При успешном создании курьера возвращается код 201 и сообщение ok: true")
     public void checkCourierCreationWith201StatusCode () {
         Response response= courierSteps.createCourier();
-        response.then().statusCode(201)
+        response.then().statusCode(SC_CREATED)
                 .and()
                 .body("ok", equalTo(true));
     }
 
     //Тест падает, т.к. сообщение об ошибке отличается от требований.
     @Test
-    @DisplayName("При при попытке создать одинаковых курьеров возвращается ошибка")
+    @Description("При при попытке создать одинаковых курьеров возвращается ошибка")
     public void checkSameCouriersCreationError() {
         Response firstCourier=courierSteps.createCourier();
         Response secondCourier=courierSteps.createCourier();
 
-        secondCourier.then().statusCode(409)
+        secondCourier.then().statusCode(SC_CONFLICT)
                 .and()
                 .body("message", equalTo("Этот логин уже используется"));
     }
 
     //Тест падает, т.к. сообщение об ошибке отличается от требований.
     @Test
-    @DisplayName("При при попытке создать осоздать пользователя с логином, который уже есть, возвращается ошибка")
+    @Description("При при попытке создать осоздать пользователя с логином, который уже есть, возвращается ошибка")
     public void checkSameLoginCreationError() {
         Response firstCourier=courierSteps.createCourier();
         Response secondCourier=courierSteps.createCourierWithSameLogin();
-        secondCourier.then().statusCode(409)
+        secondCourier.then().statusCode(SC_CONFLICT)
                 .and()
                 .body("message", equalTo("Этот логин уже используется"));
     }
 
     @Test
-    @DisplayName("Eсли одного из обязательных полей нет, запрос возвращает 400")
-    public void checkCourierCreationWhenRequiredFieldMissingReturnsError() {
+    @Description("Eсли не задан логин, запрос возвращает 400")
+    public void checkCourierCreationWhenLoginMissingReturnsError() {
         Response response=courierSteps.createCourierWithoutLogin();
-        response.then().statusCode(400)
+        response.then().statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message",equalTo("Недостаточно данных для создания учетной записи"));
+    }
+
+    @Test
+    @Description("Eсли не задан пароль, запрос возвращает 400")
+    public void checkCourierCreationWhenPasswordMissingReturnsError() {
+        Response response=courierSteps.createCourierWithoutPassword();
+        response.then().statusCode(SC_BAD_REQUEST)
+                .and()
+                .body("message",equalTo("Недостаточно данных для создания учетной записи"));
+    }
+
+    @Test
+    @Description("Курьера можно создать без имени")
+    public void checkCourierCreationWhenFirstNameMissing() {
+        Response response=courierSteps.createCourierWithoutFirstName();
+        response.then().statusCode(SC_CREATED)
+                .and()
+                .body("ok", equalTo(true));
     }
 
     @After

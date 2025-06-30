@@ -1,17 +1,18 @@
 package ru.prakticum.steps;
 
 import io.qameta.allure.Step;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import ru.prakticum.model.Order;
 import static io.restassured.RestAssured.given;
 
-public class OrderSteps {
+public class OrderSteps extends Endpoints {
     private static String track;
-    private static final String POST_ORDER="/api/v1/orders";
-    private static final String CANCEL_ORDER="/api/v1/orders/cancel?track={track}";
+
 
     @Step
+    @DisplayName("Создать заказ")
     public Response createOrder(String firstName, String lastName, String address, String metroStation, String phone, int rentTime, String deliveryDate, String comment, String[] color) {
         Order orderData = new Order(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color);
 
@@ -27,6 +28,7 @@ public class OrderSteps {
     }
 
     @Step
+    @DisplayName("Отменить заказ")
     public static void cancelOrder(){
         given()
                 .pathParams("track",track)

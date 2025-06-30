@@ -1,25 +1,22 @@
 package ru.prakticum.steps;
 
 import io.qameta.allure.Step;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
 
-public class OrderListSteps {
-
-    private static final String GET_ORDER_LIST="/api/v1/orders";
-    private static final String GET_ORDER_LIST_BY_ID="/api/v1/orders?courierId={courierId}";
-    private static final String GET_ORDER_LIST_WITH_NEAREST_STATIONS="/api/v1/orders?courierId={courierId}&nearestStation=[\"1\", \"2\"]";
-    private static final String GET_AVAILABLE_ORDER_LIST="/api/v1/orders?limit=10&page=0";
-    private static final String GET_ORDER_LIST_NEAR_METRO="/api/v1/orders?limit=10&page=0&nearestStation=[\"110\"]";
+public class OrderListSteps extends Endpoints {
 
     @Step
+    @DisplayName("Получить список заказов")
     public Response getOrderList() {
         return given()
                 .get(GET_ORDER_LIST);
     }
 
     @Step
+    @DisplayName("Получить список заказов по id курьера")
     public Response getCourierOrderList(int courierId) {
         return given()
                 .pathParams("courierId",courierId)
@@ -27,6 +24,7 @@ public class OrderListSteps {
     }
 
     @Step
+    @DisplayName("Получить список заказов на ближайших станциях")
     public Response getCourierOrderListWithNearestStations(int courierId) {
         return given()
                 .pathParams("courierId",courierId)
@@ -34,12 +32,14 @@ public class OrderListSteps {
     }
 
     @Step
+    @DisplayName("Получить список доступных для принятия курьером заказов")
     public Response getAvailableOrderList() {
         return given()
                 .get(GET_AVAILABLE_ORDER_LIST);
     }
 
     @Step
+    @DisplayName("Получить список доступных заказов около станции метро")
     public Response getAvailableOrderListNearMetroStation() {
         return given()
                 .get(GET_ORDER_LIST_NEAR_METRO);
